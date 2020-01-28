@@ -1,0 +1,7 @@
+{
+    "name": "chore-server",
+    "jwtPrivateKey": "",
+    "mongodb": {
+        "connection-string": ""
+    }
+}

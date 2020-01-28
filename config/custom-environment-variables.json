@@ -1,0 +1,7 @@
+{
+    "_comment": "//Store mappings to environment variable names",
+    "jwtPrivateKey": "chore-server_jwtPrivateKey",
+    "mongodb": {
+        "connection-string": "mongoConnectionString"
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "name": "Chore Server",
+    "mongodb": {
+        "dbName": "chore-server-mongodb_documents_azure_com"
+    }
+}

@@ -1,0 +1,4 @@
+{
+    "name": "Chore Server - Development",
+    "connection-string": "mongodb://localhost/chore-server"
+}
