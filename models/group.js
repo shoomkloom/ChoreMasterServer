@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
-const {userSchema} = require('./user');
 
 const groupSchema = new mongoose.Schema({
     name: { 
@@ -10,15 +9,18 @@ const groupSchema = new mongoose.Schema({
         minlength:5,
         maxlength:50
     },
-    masterUser: {
-        type: userSchema,
-        required: true
+    masterId: {
+        type: String, 
+        required: true,
+        trim: true
     },
-    slaveUsers: [{
-        type: userSchema
+    slaveIds: [{
+        type: String, 
+        trim: true
     }],
     createdDate: {
-        type: Date
+        type: Date,
+        required: true
     },
     updatedDate: {
         type: Date
