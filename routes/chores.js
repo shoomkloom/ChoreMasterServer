@@ -44,7 +44,6 @@ router.post('/', auth, async function (req, res) {
 
     //Create a new chore
     let chore = new Chore({
-        name: req.body.name,
         choreTemplateId: req.body.choreTemplateId,
         masterId: req.body.masterId,
         slaveId: req.body.slaveId,
@@ -67,8 +66,13 @@ router.put('/:id', auth, async function (req, res) {
     }
 
     //Update requested chore
-    chore = req.body;
+    chore.choreTemplateId = req.body.choreTemplateId;
+    chore.masterId = req.body.masterId;
+    chore.slaveId = req.body.slaveId;
+    chore.scheduledDates = req.body.scheduledDates;
+    chore.comment = req.body.comment;
     chore.updatedDate = new Date();
+
     chore = await chore.save();
 
     //Send the updated chore
