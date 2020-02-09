@@ -30,7 +30,8 @@ router.get('/:id', async function (req, res) {
 
 router.post('/', auth, async function (req, res) {
     logger.debug('POST / - Invoked');
-    //Validate requested  details
+    
+    //Validate requested details
     const result = validateGroup(req.body);
     if(result.error){
         logger.error(`ERROR - ${result.error.message}`);
@@ -56,8 +57,8 @@ router.post('/', auth, async function (req, res) {
     res.send(group);
 });
 
-router.put('/:id/addUser', auth, async function (req, res) {
-    logger.debug(`PUT /${req.params.id}/addUser - Invoked`);
+router.put('/:id/addUser/:userId', auth, async function (req, res) {
+    logger.debug(`PUT /${req.params.id}/addUser/${req.params.userId} - Invoked`);
     let group = await Group.findById(req.params.id);
 
     if(!group){
@@ -66,19 +67,19 @@ router.put('/:id/addUser', auth, async function (req, res) {
     }
 
     //Find the customer by id in the request
-    const slaveUser = await User.findById(req.body.userId);
+    const slaveUser = await User.findById(req.params.userId);
     if(!slaveUser){
-        logger.error(`Could not find a user with id=${req.body.userId}`);
-        return res.status(404).send(`Could not find a user with id=${req.body.userId}`);
+        logger.error(`Could not find a user with id=${req.params.userId}`);
+        return res.status(404).send(`Could not find a user with id=${req.params.userId}`);
     }
     
     //Update requested group
-    if(group.slaveIds.indexOf(req.body.userId) > -1){
-        logger.info(`Group already has a user with id=${req.body.userId}`);
-        return res.status(204).send(`Group already has a user with id=${req.body.userId}`);
+    if(group.slaveIds.indexOf(req.params.userId) > -1){
+        logger.info(`Group already has a user with id=${req.params.userId}`);
+        return res.status(204).send(`Group already has a user with id=${req.params.userId}`);
     }
     else{
-        group.slaveIds.push(req.body.userId);
+        group.slaveIds.push(req.params.userId);
         group.updatedDate = new Date();
         group = await group.save();
     }
@@ -87,8 +88,8 @@ router.put('/:id/addUser', auth, async function (req, res) {
     res.send(group);
 });
 
-router.put('/:id/removeUser', auth, async function (req, res) {
-    logger.debug(`PUT /${req.params.id}/removeUser - Invoked`);
+router.put('/:id/removeUser/:userId', auth, async function (req, res) {
+    logger.debug(`PUT /${req.params.id}/removeUser/${req.params.userId} - Invoked`);
     let group = await Group.findById(req.params.id);
 
     if(!group){
@@ -97,17 +98,42 @@ router.put('/:id/removeUser', auth, async function (req, res) {
     }
 
     //Find the customer by id in the request
-    const slaveUser = await User.findById(req.body.userId);
+    const slaveUser = await User.findById(req.params.userId);
     if(!slaveUser){
-        logger.error(`Could not find a user with id=${req.body.userId}`);
-        return res.status(404).send(`Could not find a user with id=${req.body.userId}`);
+        logger.error(`Could not find a user with id=${req.params.userId}`);
+        return res.status(404).send(`Could not find a user with id=${req.params.userId}`);
     }
     
     //Update requested group
-    const index = group.slaveIds.indexOf(req.body.userId);
+    const index = group.slaveIds.indexOf(req.params.userId);
     if (index > -1) {
         group.slaveIds.splice(index, 1);
     }
+    group.updatedDate = new Date();
+    group = await group.save();
+
+    //Send the updated group
+    res.send(group);
+});
+
+router.put('/', auth, async function (req, res) {
+    logger.debug(`PUT / - Invoked`);
+    
+    //Validate requested details
+    const result = validateGroup(req.body);
+    if(result.error){
+        logger.error(`ERROR - ${result.error.message}`);
+        return res.status(400).send(result.error.message);
+    }
+
+    const masterUser = await User.findById(req.body.masterId);
+    if(!masterUser){
+        logger.error(`Could not find a user with id=${req.body.id}`);
+        return res.status(404).send(`Could not find a user with id=${req.body.id}`);
+    }
+    
+    //Update requested group
+    group.name = req.body.name;
     group.updatedDate = new Date();
     group = await group.save();
 

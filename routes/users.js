@@ -7,20 +7,25 @@ const bcrypt = require('bcryptjs');
 const log4js = require('log4js');
 const logger = log4js.getLogger('users');
 
-router.get('/me', auth, async function (req, res) {
-    logger.debug('GET /me - Invoked');
-    try{
-        const user = await User.findById(req.user._id).select('-password');
-        return res.send(user);
+router.get('/:id', auth, async function (req, res) {
+    logger.debug(`GET /${req.params.id} - Invoked`);
+    //Find requested user
+    const user = await User.findById(req.params.id);
+
+    if(!user){
+        logger.error(`Could not find a user with id=${req.params.id} - ` + ex);
+        return res.status(404).send(`Could not find a user with id=${req.params.id}`);
     }
-    catch(ex){
-        logger.error(`EXCEPTION - ${ex}`);
-        return res.status(500).send(ex);
-    }
+    
+    //Get the requested user
+    res.send(user);
 });
 
-router.post('/', auth, async function (req, res) {
+router.post('/', async function (req, res) {
     logger.debug('POST / - Invoked');
+
+    console.log('req.body: ', req.body);
+
     //Validate requested  details
     const result = validateUser(req.body);
     if(result.error){

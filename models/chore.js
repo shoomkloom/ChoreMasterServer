@@ -6,6 +6,9 @@ const choreSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
+    imageUrl: {
+        type: String
+    },
     masterId: {
         type: String, 
         required: true

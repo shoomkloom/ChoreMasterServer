@@ -33,6 +33,9 @@ const userSchema = new mongoose.Schema({
         minlength:5,
         maxlength:1024
     },
+    imageUrl: {
+        type: String
+    },
     createdDate: {
         type: Date,
         required: true

@@ -9,6 +9,9 @@ const groupSchema = new mongoose.Schema({
         minlength:5,
         maxlength:50
     },
+    imageUrl: {
+        type: String
+    },
     masterId: {
         type: String, 
         required: true,

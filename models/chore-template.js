@@ -9,6 +9,9 @@ const choreTemplateSchema = new mongoose.Schema({
         minlength:4,
         maxlength:50
     },
+    imageUrl: {
+        type: String
+    },
     details: { 
         type: String, 
         required: true,
