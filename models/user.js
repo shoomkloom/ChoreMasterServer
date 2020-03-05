@@ -42,12 +42,11 @@ const userSchema = new mongoose.Schema({
     },
     updatedDate: {
         type: Date
-    }/*@@,
-    isAdmin: Boolean*/
+    }
 },{collection: 'users'});
 
 userSchema.methods.generateAuthToken = function(){
-    const token = jwt.sign({ _id: this._id/*@@, isAdmin: this.isAdmin*/ }, config.get('jwtPrivateKey'));
+    const token = jwt.sign({ _id: this._id }, config.get('jwtPrivateKey'));
     return token;
 }
 

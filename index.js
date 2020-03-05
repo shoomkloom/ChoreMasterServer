@@ -13,10 +13,6 @@ require('./startup/prod')(app);
 const logger = log4js.getLogger('index');
 logger.info('=========== Starting Chore Server ===========');
 
-//*@@*/ throw new Error('Unhandled Exception!');
-//*@@*/ const p = Promise.reject(new Error('Promise rejected!'));
-//*@@*/ p.then(() => console.log('Done'));
-
 app.get('/', (req, res) => {
     //Say Hello on root
     res.send('-- This is Chore Master Server --');

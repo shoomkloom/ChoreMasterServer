@@ -28,6 +28,28 @@ router.get('/:id', async function (req, res) {
     res.send(group);
 });
 
+router.get('/master/:masterid', async function (req, res) {
+    logger.debug(`GET /${req.params.masterid} - Invoked`);
+    //Find groups with this masterId
+    const groups = await Group.find({ masterId: masterid });
+
+    //Get the found groups
+    res.send(groups);
+});
+
+router.get('/slave/:slaveid', async function (req, res) {
+    logger.debug(`GET /${req.params.slaveid} - Invoked`);
+
+    //Find groups that has this slaveId
+    const groups = await Group.find(
+        {
+           $elemMatch: {"slaveIds" : req.params.slaveid } 
+        });
+
+    //Get the found groups
+    res.send(groups);
+});
+
 router.post('/', auth, async function (req, res) {
     logger.debug('POST / - Invoked');
     

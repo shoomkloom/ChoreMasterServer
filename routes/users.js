@@ -26,7 +26,7 @@ router.post('/', async function (req, res) {
 
     console.log('req.body: ', req.body);
 
-    //Validate requested  details
+    //Validate requested details
     const result = validateUser(req.body);
     if(result.error){
         logger.error(`ERROR - ${result.error}`);

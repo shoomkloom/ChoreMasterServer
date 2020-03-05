@@ -5,8 +5,12 @@ const mongoose = require('mongoose');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const Joi = require('joi');
+const log4js = require('log4js');
+const logger = log4js.getLogger('auth');
 
 router.post('/', async function (req, res) {
+    logger.debug('POST / - Invoked');
+
     //Validate requested  details
     const result = validateUser(req.body);
     if(result.error) return res.status(400).send(result.error.message);
@@ -18,11 +22,13 @@ router.post('/', async function (req, res) {
     if(!validPassword) return res.status(400).send('Invalid email or password');
 
     const token = user.generateAuthToken();
-    res.send(token);
+    res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
 });
 
 //Utilities
 function validateUser(req){
+    logger.debug('validateUser(.) - Invoked');
+
     const schema = {
         email: Joi.string().min(5).max(255).email().required(),
         password: Joi.string().min(5).max(255).required()
