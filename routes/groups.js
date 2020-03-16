@@ -28,6 +28,39 @@ router.get('/:id', async function (req, res) {
     res.send(group);
 });
 
+router.get('/:id/users', async function (req, res) {
+    logger.debug(`GET /${req.params.id}/users - Invoked`);
+    //Find requested group
+    const group = await Group.findById(req.params.id);
+
+    if(!group){
+        logger.error(`Could not find a group with id=${req.params.id} - ` + ex);
+        return res.status(404).send(`Could not find a group with id=${req.params.id}`);
+    }
+
+    //collect all group users to array
+    let groupUsers = [];
+    
+    const masterUser = await User.findById(group.masterId);
+    if(!masterUser){
+        logger.error(`Could not find the group master with id=${group.masterId}`);
+        return res.status(404).send(`Could not find a group master with id=${group.masterId}`);
+    }
+    groupUsers.push(masterUser);
+
+    for(let groupSlaveId of group.slaveIds) {
+        let slaveUser = await User.findById(groupSlaveId);
+        if(!slaveUser){
+            logger.error(`Could not find the group slave with id=${groupSlaveId}`);
+            return res.status(404).send(`Could not find a group slave with id=${groupSlaveId}`);
+        }
+        groupUsers.push(slaveUser);
+    }
+    
+    //Get the requested group users
+    res.send(groupUsers);
+});
+
 router.get('/master/:masterid', async function (req, res) {
     logger.debug(`GET /${req.params.masterid} - Invoked`);
     //Find groups with this masterId
