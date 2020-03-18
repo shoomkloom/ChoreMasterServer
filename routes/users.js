@@ -7,6 +7,13 @@ const bcrypt = require('bcryptjs');
 const log4js = require('log4js');
 const logger = log4js.getLogger('users');
 
+router.get('/', auth, async function (req, res) {
+    logger.debug('GET / - Invoked');
+    //Get the list of users
+    const users = await User.find().sort('name');
+    res.send(users);
+});
+
 router.get('/:id', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id} - Invoked`);
     //Find requested user
@@ -42,7 +49,6 @@ router.post('/', async function (req, res) {
     //Create a new user and add to db
     user = new User(_.pick(req.body, ['name', 'email', 'password', 'phone']));
     user.createdDate = new Date();
-    user.updatedDate = new Date();
 
     const salt = await bcrypt.genSalt(10);   
     user.password = await bcrypt.hash(user.password, salt) ;

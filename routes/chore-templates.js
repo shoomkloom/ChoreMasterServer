@@ -6,14 +6,14 @@ const router = express.Router();
 const log4js = require('log4js');
 const logger = log4js.getLogger('chore-templates');
 
-router.get('/', async function (req, res) {
+router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of choreTemplates
     const choreTemplates = await ChoreTemplate.find().sort('name');
     res.send(choreTemplates);
 });
 
-router.get('/:id', async function (req, res) {
+router.get('/:id', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id} - Invoked`);
     //Find requested choreTemplate
     const choreTemplate = await ChoreTemplate.findById(req.params.id);
@@ -54,8 +54,7 @@ router.post('/', auth, async function (req, res) {
         details: req.body.details,
         creatorId: req.body.creatorId,
         state: 'enabled',
-        createdDate: new Date(),
-        updatedDate: new Date()
+        createdDate: new Date()
     });
 
     choreTemplate = await choreTemplate.save();

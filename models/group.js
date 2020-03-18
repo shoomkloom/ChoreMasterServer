@@ -36,7 +36,8 @@ const Group = mongoose.model('Group', groupSchema, 'groups');
 function validateGroup(group){
     const groupSchema = {
         name: Joi.string().min(5).max(50).required(),
-        masterId: Joi.objectId().required()
+        masterId: Joi.objectId().required(),
+        slaveIds: Joi.array()
     }
     return Joi.validate(group, groupSchema);
 };

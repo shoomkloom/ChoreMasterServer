@@ -7,14 +7,21 @@ const mongoose = require('mongoose');
 const log4js = require('log4js');
 const logger = log4js.getLogger('groups');
 
-router.get('/', async function (req, res) {
+router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of groups
     const groups = await Group.find().sort('name');
     res.send(groups);
 });
 
-router.get('/:id', async function (req, res) {
+router.get('/me/:masterId', auth, async function (req, res) {
+    logger.debug('GET /me/:masterId - Invoked');
+    //Get the list of groups created by masterId
+    const groups = await Group.find({masterId: req.params.masterId}).sort('name');
+    res.send(groups);
+});
+
+router.get('/:id', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id} - Invoked`);
     //Find requested group
     const group = await Group.findById(req.params.id);
@@ -28,7 +35,7 @@ router.get('/:id', async function (req, res) {
     res.send(group);
 });
 
-router.get('/:id/users', async function (req, res) {
+router.get('/:id/users', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id}/users - Invoked`);
     //Find requested group
     const group = await Group.findById(req.params.id);
@@ -61,7 +68,7 @@ router.get('/:id/users', async function (req, res) {
     res.send(groupUsers);
 });
 
-router.get('/master/:masterid', async function (req, res) {
+router.get('/master/:masterid', auth, async function (req, res) {
     logger.debug(`GET /${req.params.masterid} - Invoked`);
     //Find groups with this masterId
     const groups = await Group.find({ masterId: masterid });
@@ -70,7 +77,7 @@ router.get('/master/:masterid', async function (req, res) {
     res.send(groups);
 });
 
-router.get('/slave/:slaveid', async function (req, res) {
+router.get('/slave/:slaveid', auth, async function (req, res) {
     logger.debug(`GET /${req.params.slaveid} - Invoked`);
 
     //Find groups that has this slaveId
@@ -103,9 +110,14 @@ router.post('/', auth, async function (req, res) {
     let group = new Group({
         name: req.body.name,
         masterId: req.body.masterId,
-        createdDate: new Date(),
-        updatedDate: new Date()
+        createdDate: new Date()
     });
+
+    if(req.body.slaveIds){
+        req.body.slaveIds.forEach(slaveId => {
+            group.slaveIds.push(slaveId);
+        });
+    }
 
     group = await group.save();
 
@@ -113,8 +125,8 @@ router.post('/', auth, async function (req, res) {
     res.send(group);
 });
 
-router.put('/:id/addUser/:userId', auth, async function (req, res) {
-    logger.debug(`PUT /${req.params.id}/addUser/${req.params.userId} - Invoked`);
+router.put('/:id/addUser', auth, async function (req, res) {
+    logger.debug(`PUT /${req.params.id}/addUser with userId: ${req.body.userId} - Invoked`);
     let group = await Group.findById(req.params.id);
 
     if(!group){
@@ -123,19 +135,19 @@ router.put('/:id/addUser/:userId', auth, async function (req, res) {
     }
 
     //Find the customer by id in the request
-    const slaveUser = await User.findById(req.params.userId);
+    const slaveUser = await User.findById(req.body.userId);
     if(!slaveUser){
-        logger.error(`Could not find a user with id=${req.params.userId}`);
-        return res.status(404).send(`Could not find a user with id=${req.params.userId}`);
+        logger.error(`Could not find a user with id=${req.body.userId}`);
+        return res.status(404).send(`Could not find a user with id=${req.body.userId}`);
     }
     
     //Update requested group
-    if(group.slaveIds.indexOf(req.params.userId) > -1){
-        logger.info(`Group already has a user with id=${req.params.userId}`);
-        return res.status(204).send(`Group already has a user with id=${req.params.userId}`);
+    if(group.slaveIds.indexOf(req.body.userId) > -1){
+        logger.info(`Group already has a user with id=${req.body.userId}`);
+        return res.status(204).send(`Group already has a user with id=${req.body.userId}`);
     }
     else{
-        group.slaveIds.push(req.params.userId);
+        group.slaveIds.push(req.body.userId);
         group.updatedDate = new Date();
         group = await group.save();
     }
@@ -144,8 +156,8 @@ router.put('/:id/addUser/:userId', auth, async function (req, res) {
     res.send(group);
 });
 
-router.put('/:id/removeUser/:userId', auth, async function (req, res) {
-    logger.debug(`PUT /${req.params.id}/removeUser/${req.params.userId} - Invoked`);
+router.put('/:id/removeUser', auth, async function (req, res) {
+    logger.debug(`PUT /${req.params.id}/removeUser userId: ${req.body.userId} - Invoked`);
     let group = await Group.findById(req.params.id);
 
     if(!group){
@@ -154,14 +166,14 @@ router.put('/:id/removeUser/:userId', auth, async function (req, res) {
     }
 
     //Find the customer by id in the request
-    const slaveUser = await User.findById(req.params.userId);
+    const slaveUser = await User.findById(req.body.userId);
     if(!slaveUser){
-        logger.error(`Could not find a user with id=${req.params.userId}`);
-        return res.status(404).send(`Could not find a user with id=${req.params.userId}`);
+        logger.error(`Could not find a user with id=${req.body.userId}`);
+        return res.status(404).send(`Could not find a user with id=${req.body.userId}`);
     }
     
     //Update requested group
-    const index = group.slaveIds.indexOf(req.params.userId);
+    const index = group.slaveIds.indexOf(req.body.userId);
     if (index > -1) {
         group.slaveIds.splice(index, 1);
     }

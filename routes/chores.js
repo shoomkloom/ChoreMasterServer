@@ -6,14 +6,14 @@ const router = express.Router();
 const log4js = require('log4js');
 const logger = log4js.getLogger('chores');
 
-router.get('/', async function (req, res) {
+router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of chores
     const chores = await Chore.find().sort('name');
     res.send(chores);
 });
 
-router.get('/:id', async function (req, res) {
+router.get('/:id', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id} - Invoked`);
     //Find requested chore
     const chore = await Chore.findById(req.params.id);
@@ -50,8 +50,7 @@ router.post('/', auth, async function (req, res) {
         scheduledDates: req.body.scheduledDates,
         comment: req.body.comment,
         state: 'enabled',
-        createdDate: new Date(),
-        updatedDate: new Date()
+        createdDate: new Date()
     });
 
     chore = await chore.save();
