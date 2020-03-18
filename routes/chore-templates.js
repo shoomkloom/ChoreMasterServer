@@ -54,7 +54,8 @@ router.post('/', auth, async function (req, res) {
         details: req.body.details,
         creatorId: req.body.creatorId,
         state: 'enabled',
-        createdDate: new Date()
+        createdDate: new Date(),
+        updatedDate: new Date()
     });
 
     choreTemplate = await choreTemplate.save();

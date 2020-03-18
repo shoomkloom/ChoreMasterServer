@@ -103,7 +103,8 @@ router.post('/', auth, async function (req, res) {
     let group = new Group({
         name: req.body.name,
         masterId: req.body.masterId,
-        createdDate: new Date()
+        createdDate: new Date(),
+        updatedDate: new Date()
     });
 
     group = await group.save();

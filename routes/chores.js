@@ -50,7 +50,8 @@ router.post('/', auth, async function (req, res) {
         scheduledDates: req.body.scheduledDates,
         comment: req.body.comment,
         state: 'enabled',
-        createdDate: new Date()
+        createdDate: new Date(),
+        updatedDate: new Date()
     });
 
     chore = await chore.save();

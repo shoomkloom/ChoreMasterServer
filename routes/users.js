@@ -42,6 +42,7 @@ router.post('/', async function (req, res) {
     //Create a new user and add to db
     user = new User(_.pick(req.body, ['name', 'email', 'password', 'phone']));
     user.createdDate = new Date();
+    user.updatedDate = new Date();
 
     const salt = await bcrypt.genSalt(10);   
     user.password = await bcrypt.hash(user.password, salt) ;
