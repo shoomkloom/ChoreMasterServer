@@ -10,14 +10,14 @@ const logger = log4js.getLogger('users');
 router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of users
-    const users = await User.find().sort('name');
+    const users = await User.find({}, {password:0}).sort('name');
     res.send(users);
 });
 
 router.get('/:id', auth, async function (req, res) {
     logger.debug(`GET /${req.params.id} - Invoked`);
     //Find requested user
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id, {password:0});
 
     if(!user){
         logger.error(`Could not find a user with id=${req.params.id} - ` + ex);
