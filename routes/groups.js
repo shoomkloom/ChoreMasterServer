@@ -184,8 +184,15 @@ router.put('/:id/removeUser', auth, async function (req, res) {
     res.send(group);
 });
 
-router.put('/', auth, async function (req, res) {
-    logger.debug(`PUT / - Invoked`);
+router.put('/:id', auth, async function (req, res) {
+    logger.debug(`PUT /${req.params.id} - Invoked`);
+
+    let group = await Group.findById(req.params.id);
+
+    if(!group){
+        logger.error(`Could not find a group with id=${req.params.id}`);
+        return res.status(404).send(`Could not find a group with id=${req.params.id}`);
+    }
     
     //Validate requested details
     const result = validateGroup(req.body);
@@ -202,6 +209,15 @@ router.put('/', auth, async function (req, res) {
     
     //Update requested group
     group.name = req.body.name;
+
+    if(req.body.slaveIds){
+        group.slaveIds = [];
+        
+        req.body.slaveIds.forEach(slaveId => {
+            group.slaveIds.push(slaveId);
+        });
+    }
+    
     group.updatedDate = new Date();
     group = await group.save();
 
