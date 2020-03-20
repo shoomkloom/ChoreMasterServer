@@ -2,6 +2,7 @@ const auth = require('../middleware/auth');
 const {ChoreTemplate, validateChoreTemplate} = require('../models/chore-template');
 const {User} = require('../models/user');
 const express = require('express');
+const _ = require('lodash');
 const router = express.Router();
 const log4js = require('log4js');
 const logger = log4js.getLogger('chore-templates');
@@ -10,7 +11,7 @@ router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of choreTemplates
     const choreTemplates = await ChoreTemplate.find().sort('name');
-    res.send(choreTemplates);
+    res.send(_.map(choreTemplates, _.partialRight(_.pick, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate'])));
 });
 
 router.get('/:id', auth, async function (req, res) {
@@ -24,7 +25,7 @@ router.get('/:id', auth, async function (req, res) {
     }
     
     //Get the requested choreTemplate
-    res.send(choreTemplate);
+    res.send(_.pick(choreTemplate, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate']));
 });
 
 router.post('/', auth, async function (req, res) {
@@ -58,7 +59,7 @@ router.post('/', auth, async function (req, res) {
     });
 
     choreTemplate = await choreTemplate.save();
-    res.send(choreTemplate);
+    res.send(_.pick(choreTemplate, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id/enable', auth, async function (req, res) {
@@ -75,7 +76,7 @@ router.put('/:id/enable', auth, async function (req, res) {
     choreTemplate = await choreTemplate.save();
 
     //Send the updated choreTemplate
-    res.send(choreTemplate);
+    res.send(_.pick(choreTemplate, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id/disable', auth, async function (req, res) {
@@ -92,7 +93,7 @@ router.put('/:id/disable', auth, async function (req, res) {
     choreTemplate = await choreTemplate.save();
 
     //Send the updated choreTemplate
-    res.send(choreTemplate);
+    res.send(_.pick(choreTemplate, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate']));
 });
 
 router.delete('/:id', auth, async function (req, res) {
@@ -105,7 +106,7 @@ router.delete('/:id', auth, async function (req, res) {
     }
     
     //Send the deleted choreTemplate
-    res.send(choreTemplate);
+    res.send(_.pick(choreTemplate, ['_id', 'name', 'imageUrl', 'details', 'creatorId', 'createdDate', 'updatedDate']));
 });
 
 module.exports = router;

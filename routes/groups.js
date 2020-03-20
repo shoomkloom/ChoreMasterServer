@@ -2,6 +2,7 @@ const auth = require('../middleware/auth');
 const {Group, validateGroup} = require('../models/group');
 const {User} = require('../models/user');
 const express = require('express');
+const _ = require('lodash');
 const router = express.Router();
 const mongoose = require('mongoose');
 const log4js = require('log4js');
@@ -11,14 +12,15 @@ router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of groups
     const groups = await Group.find().sort('name');
-    res.send(groups);
+    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.get('/me/:masterId', auth, async function (req, res) {
     logger.debug('GET /me/:masterId - Invoked');
     //Get the list of groups created by masterId
     const groups = await Group.find({masterId: req.params.masterId}).sort('name');
-    res.send(groups);
+    
+    res.send(_.map(groups, _.partialRight(_.pick, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate'])));
 });
 
 router.get('/:id', auth, async function (req, res) {
@@ -32,7 +34,7 @@ router.get('/:id', auth, async function (req, res) {
     }
     
     //Get the requested group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.get('/:id/users', auth, async function (req, res) {
@@ -65,7 +67,7 @@ router.get('/:id/users', auth, async function (req, res) {
     }
     
     //Get the requested group users
-    res.send(groupUsers);
+    res.send(_.map(groupUsers, _.partialRight(_.pick, ['_id', 'name', 'email'])));
 });
 
 router.get('/master/:masterid', auth, async function (req, res) {
@@ -74,7 +76,7 @@ router.get('/master/:masterid', auth, async function (req, res) {
     const groups = await Group.find({ masterId: masterid });
 
     //Get the found groups
-    res.send(groups);
+    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.get('/slave/:slaveid', auth, async function (req, res) {
@@ -87,7 +89,7 @@ router.get('/slave/:slaveid', auth, async function (req, res) {
         });
 
     //Get the found groups
-    res.send(groups);
+    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.post('/', auth, async function (req, res) {
@@ -122,7 +124,7 @@ router.post('/', auth, async function (req, res) {
     group = await group.save();
 
     //Send the created group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id/addUser', auth, async function (req, res) {
@@ -153,7 +155,7 @@ router.put('/:id/addUser', auth, async function (req, res) {
     }
 
     //Send the updated group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id/removeUser', auth, async function (req, res) {
@@ -181,7 +183,7 @@ router.put('/:id/removeUser', auth, async function (req, res) {
     group = await group.save();
 
     //Send the updated group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id', auth, async function (req, res) {
@@ -222,7 +224,7 @@ router.put('/:id', auth, async function (req, res) {
     group = await group.save();
 
     //Send the updated group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 router.delete('/:id', auth, async function (req, res) {
@@ -235,7 +237,7 @@ router.delete('/:id', auth, async function (req, res) {
     }
     
     //Send the deleted group
-    res.send(group);
+    res.send(_.pick(group, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
 });
 
 module.exports = router;

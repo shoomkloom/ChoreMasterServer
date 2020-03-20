@@ -2,6 +2,7 @@ const auth = require('../middleware/auth');
 const {Chore, validateChore} = require('../models/chore');
 const {User} = require('../models/user');
 const express = require('express');
+const _ = require('lodash');
 const router = express.Router();
 const log4js = require('log4js');
 const logger = log4js.getLogger('chores');
@@ -10,7 +11,7 @@ router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of chores
     const chores = await Chore.find().sort('name');
-    res.send(chores);
+    res.send(_.pick(chores, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.get('/:id', auth, async function (req, res) {
@@ -24,7 +25,7 @@ router.get('/:id', auth, async function (req, res) {
     }
     
     //Get the requested chore
-    res.send(chore);
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.post('/', auth, async function (req, res) {
@@ -54,7 +55,7 @@ router.post('/', auth, async function (req, res) {
     });
 
     chore = await chore.save();
-    res.send(chore);
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id', auth, async function (req, res) {
@@ -76,7 +77,7 @@ router.put('/:id', auth, async function (req, res) {
     chore = await chore.save();
 
     //Send the updated chore
-    res.send(chore);
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.delete('/:id', auth, async function (req, res) {
@@ -89,7 +90,7 @@ router.delete('/:id', auth, async function (req, res) {
     }
     
     //Send the deleted chore
-    res.send(chore);
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 module.exports = router;
