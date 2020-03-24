@@ -6,8 +6,22 @@ const choreSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
+    name: { 
+        type: String, 
+        required: true,
+        trim: true,
+        minlength:4,
+        maxlength:50
+    },
     imageUrl: {
         type: String
+    },
+    details: { 
+        type: String, 
+        required: true,
+        trim: true,
+        minlength:5,
+        maxlength:1024
     },
     masterId: {
         type: String, 
@@ -30,8 +44,7 @@ const choreSchema = new mongoose.Schema({
             everyMonth: Boolean,
             everyYear: Boolean,
             repititions: Number
-        },
-        required: true
+        }
     },
     comment: { 
         type: String, 
@@ -55,8 +68,7 @@ function validateChore(chore){
     const choreSchema = {
         masterId: Joi.objectId().required(),
         choreTemplateId: Joi.objectId().required(),
-        slaveId: Joi.objectId().required(),
-        scheduledDates: Joi.object()
+        slaveId: Joi.objectId().required()
     }
     return Joi.validate(chore, choreSchema);
 };

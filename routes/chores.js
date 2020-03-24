@@ -1,6 +1,7 @@
 const auth = require('../middleware/auth');
 const {Chore, validateChore} = require('../models/chore');
 const {User} = require('../models/user');
+const {ChoreTemplate} = require('../models/chore-template');
 const express = require('express');
 const _ = require('lodash');
 const router = express.Router();
@@ -11,7 +12,7 @@ router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of chores
     const chores = await Chore.find().sort('name');
-    res.send(_.pick(chores, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chores, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.get('/:id', auth, async function (req, res) {
@@ -25,7 +26,7 @@ router.get('/:id', auth, async function (req, res) {
     }
     
     //Get the requested chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.post('/', auth, async function (req, res) {
@@ -39,13 +40,21 @@ router.post('/', auth, async function (req, res) {
 
     const masterUser = await User.findById(req.body.masterId);
     if(!masterUser){
-        logger.error(`Could not find a user with id=${req.body.id}`);
-        return res.status(404).send(`Could not find a user with id=${req.body.id}`);
+        logger.error(`Could not find a user with id=${req.body.masterId}`);
+        return res.status(404).send(`Could not find a user with id=${req.body.masterId}`);
+    }
+
+    const choreTemplate = await ChoreTemplate.findById(req.body.choreTemplateId);
+    if(!choreTemplate){
+        logger.error(`Could not find a chore template with id=${req.body.choreTemplateId}`);
+        return res.status(404).send(`Could not find a chore template with id=${req.body.choreTemplateId}`);
     }
 
     //Create a new chore
     let chore = new Chore({
+        name: choreTemplate.name,
         choreTemplateId: req.body.choreTemplateId,
+        details: choreTemplate.details,
         masterId: req.body.masterId,
         slaveId: req.body.slaveId,
         scheduledDates: req.body.scheduledDates,
@@ -55,7 +64,7 @@ router.post('/', auth, async function (req, res) {
     });
 
     chore = await chore.save();
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id', auth, async function (req, res) {
@@ -77,7 +86,7 @@ router.put('/:id', auth, async function (req, res) {
     chore = await chore.save();
 
     //Send the updated chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.delete('/:id', auth, async function (req, res) {
@@ -90,7 +99,7 @@ router.delete('/:id', auth, async function (req, res) {
     }
     
     //Send the deleted chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
 });
 
 module.exports = router;
