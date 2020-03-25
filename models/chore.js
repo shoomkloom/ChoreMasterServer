@@ -10,7 +10,7 @@ const choreSchema = new mongoose.Schema({
         type: String, 
         required: true,
         trim: true,
-        minlength:4,
+        minlength:3,
         maxlength:50
     },
     imageUrl: {
@@ -20,7 +20,6 @@ const choreSchema = new mongoose.Schema({
         type: String, 
         required: true,
         trim: true,
-        minlength:5,
         maxlength:1024
     },
     masterId: {
@@ -31,25 +30,35 @@ const choreSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
-    state: {
+    state: { //Pending, Done, Reject
         type: String, 
         required: true
     },
-    scheduledDates: { 
-        type: {
-            nextDate: Date,
-            pastDates: [Date],
-            everyDay: Boolean,
-            everyWeek: Boolean,
-            everyMonth: Boolean,
-            everyYear: Boolean,
-            repititions: Number
-        }
+    date: {
+        type: Date,
+        required: true
     },
+/*@@  
+    Should probably add Sun, Mon, Tue... instead of 'everyDay'
+    everyDay: {
+        type: Boolean
+    },
+    everyWeek: {
+        type: Boolean
+    },
+    everyMonth: {
+        type: Boolean
+    },
+    everyYear: {
+        type: Boolean
+    },
+    repititions: {
+        type: Number
+    },
+@@*/    
     comment: { 
         type: String, 
         trim: true,
-        minlength:5,
         maxlength:1024
     },
     createdDate: {
@@ -68,7 +77,9 @@ function validateChore(chore){
     const choreSchema = {
         masterId: Joi.objectId().required(),
         choreTemplateId: Joi.objectId().required(),
-        slaveId: Joi.objectId().required()
+        slaveId: Joi.objectId().required(),
+        state: Joi.string().required(),
+        date: Joi.date().required()
     }
     return Joi.validate(chore, choreSchema);
 };

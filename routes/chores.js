@@ -31,6 +31,7 @@ router.get('/:id', auth, async function (req, res) {
 
 router.post('/', auth, async function (req, res) {
     logger.debug('POST / - Invoked');
+
     //Validate requested  details
     const result = validateChore(req.body);
     if(result.error){
@@ -59,7 +60,8 @@ router.post('/', auth, async function (req, res) {
         slaveId: req.body.slaveId,
         scheduledDates: req.body.scheduledDates,
         comment: req.body.comment,
-        state: 'enabled',
+        state: req.body.state,
+        date: req.body.date,
         createdDate: new Date()
     });
 
@@ -76,11 +78,13 @@ router.put('/:id', auth, async function (req, res) {
     }
 
     //Update requested chore
-    chore.choreTemplateId = req.body.choreTemplateId;
-    chore.masterId = req.body.masterId;
-    chore.slaveId = req.body.slaveId;
-    chore.scheduledDates = req.body.scheduledDates;
-    chore.comment = req.body.comment;
+    if(req.body.state){
+        chore.state = req.body.state;
+    }
+    if(req.body.comment){
+        chore.comment = req.body.comment;
+    }
+
     chore.updatedDate = new Date();
 
     chore = await chore.save();
