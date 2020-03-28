@@ -12,7 +12,7 @@ router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of groups
     const groups = await Group.find().sort('name');
-    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
+    res.send(_.map(groups, _.partialRight(_.pick, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate'])));
 });
 
 router.get('/me/:masterId', auth, async function (req, res) {
@@ -76,7 +76,7 @@ router.get('/master/:masterid', auth, async function (req, res) {
     const groups = await Group.find({ masterId: masterid });
 
     //Get the found groups
-    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
+    res.send(_.map(groups, _.partialRight(_.pick, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate'])));
 });
 
 router.get('/slave/:slaveid', auth, async function (req, res) {
@@ -89,7 +89,7 @@ router.get('/slave/:slaveid', auth, async function (req, res) {
         });
 
     //Get the found groups
-    res.send(_.pick(groups, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate']));
+    res.send(_.map(groups, _.partialRight(_.pick, ['_id', 'name', 'masterId', 'slaveIds', 'createdDate', 'updatedDate'])));
 });
 
 router.post('/', auth, async function (req, res) {

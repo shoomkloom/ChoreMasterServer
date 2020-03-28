@@ -11,8 +11,15 @@ const logger = log4js.getLogger('chores');
 router.get('/', auth, async function (req, res) {
     logger.debug('GET / - Invoked');
     //Get the list of chores
-    const chores = await Chore.find().sort('name');
-    res.send(_.pick(chores, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    const chores = await Chore.find().sort('date');
+    res.send(_.map(chores, _.partialRight(_.pick, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate'])));
+});
+
+router.get('/me/:id', auth, async function (req, res) {
+    logger.debug(`GET /me/${req.params.id} - Invoked`);
+    //Get the list of chores assigne to me
+    const chores = await Chore.find({slaveId: req.params.id}).sort('date');
+    res.send(_.map(chores, _.partialRight(_.pick, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate'])));
 });
 
 router.get('/:id', auth, async function (req, res) {
@@ -26,7 +33,7 @@ router.get('/:id', auth, async function (req, res) {
     }
     
     //Get the requested chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.post('/', auth, async function (req, res) {
@@ -66,7 +73,7 @@ router.post('/', auth, async function (req, res) {
     });
 
     chore = await chore.save();
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.put('/:id', auth, async function (req, res) {
@@ -90,7 +97,7 @@ router.put('/:id', auth, async function (req, res) {
     chore = await chore.save();
 
     //Send the updated chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate']));
 });
 
 router.delete('/:id', auth, async function (req, res) {
@@ -103,7 +110,7 @@ router.delete('/:id', auth, async function (req, res) {
     }
     
     //Send the deleted chore
-    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'scheduledDates', 'comment', 'createdDate', 'updatedDate']));
+    res.send(_.pick(chore, ['_id', 'choreTemplateId', 'name', 'imageUrl', 'details', 'masterId', 'slaveId', 'state', 'date', 'comment', 'createdDate', 'updatedDate']));
 });
 
 module.exports = router;
